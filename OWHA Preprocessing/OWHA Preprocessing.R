@@ -5,7 +5,7 @@ title: "Multimodal Atlas Preprocessing"
 knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
 
 # --- USER CONFIGURATION ---
-data_root <- "~/SRSP Laboratory Dropbox/SRSP Lab/Resources/Town Square - Data Share/scRNA SEQ of wounds/Skin Wound Healing Atlas"
+data_root <- ##"local directory"
 # ---------------------------
 
 library(Seurat)
@@ -46,8 +46,7 @@ sn_base <- file.path(data_root, "Raw Data/snRNAseq Raw Data")
 sn_dirs <- list(
   YJ001_uw = "YJ001_UW", YJ002_d7 = "YJ002_DPW7", YJ003_d7 = "YJ003_DPW7",
   YJ004_d15 = "YJ004_DPW15", YJ005_d15 = "YJ005_DPW15", YJ006_d30 = "YJ006_DPW30",
-  YJ007_d30 = "YJ007_DPW30", YJ008_uw = "YJ008_UWO", YJ009_d4 = "YJ009_DPW4",
-  YJ010_d4 = "YJ0010_DPW4", 
+  YJ007_d30 = "YJ007_DPW30",
   YJ011_uw = "YJ011_UW/YJ011_cellranger_count_outs/filtered_feature_bc_matrix",
   YJ012_d4 = "YJ012_D4PW/YJ012_cellranger_count_outs/filtered_feature_bc_matrix",
   YJ013_d4 = "YJ013_D4PW/YJ012_cellranger_count_outs/filtered_feature_bc_matrix"
@@ -126,8 +125,8 @@ vu_objs <- list(
 )
 
 sn_projects <- c("UW_snRNAseq_1", "D7PW_snRNAseq_1", "D7PW_snRNAseq_2", "D15PW_snRNAseq_1", 
-                 "D15PW_snRNAseq_2", "D30PW_snRNAseq_1", "D30PW_snRNAseq_2", "UW_snRNAseq_2", 
-                 "D4PW_snRNAseq_1", "D4PW_snRNAseq_2", "UW_snRNAseq_3", "D4PW_snRNAseq_3", "D4PW_snRNAseq_4")
+                 "D15PW_snRNAseq_2", "D30PW_snRNAseq_1", "D30PW_snRNAseq_2", 
+                  "UW_snRNAseq_3", "D4PW_snRNAseq_3", "D4PW_snRNAseq_4")
 sn_objs <- mapply(function(d, p) CreateSeuratObject(d, project = p, min.cells = 3), 
                   sn_data_list, sn_projects)
 
@@ -159,16 +158,39 @@ alldata$modality <- case_when(
   TRUE ~ "scRNAseq"
 )
 
-alldata$internal_external <- ifelse(alldata$modality == "scRNAseq", "External", "Internal")
 alldata$timepoint_modality <- paste(alldata$timepoint, alldata$modality, sep = "_")
 
 # Add Sex and Chemistry
-# [Note: Map remaining values here as needed]
 source_meta <- list(
-  sex = c("UW_Haensel1"="Female", "D1PW_Justynski"="Male", "D4PW_snRNAseq_2"="Male"),
-  chem = c("UW_Haensel1"="10X Chromium v1", "UW_Vu_v3"="10X Chromium v3")
+  sex = c( "UW_Haensel1" = "Female", "UW_Haensel2" = "Female", "UW_Vu_v3" = "Female", "UW_CITEseq_1" = "Mixed",
+    "UW_CITEseq_2" = "Mixed","UW_snRNAseq_1" = "Mixed","UW_snRNAseq_2" = "Mixed",
+    "UW_snRNAseq_3" = "Mixed","D1PW_Justynski" = "Male","D2PW_Justynski" = "Male",
+    "D4PW_Haensel1" = "Female","D4PW_Haensel2" = "Female","D4PW_Haensel3" = "Female",
+    "D4PW_Vu_v3" = "Female","D4PW_snRNAseq_1" = "Female","D4PW_snRNAseq_2" = "Male",
+    "D4PW_snRNAseq_3" = "Female","D4PW_snRNAseq_4" = "Male","D7PW_Vu_v2_1" = "Female",
+    "D7PW_Vu_v2_2" = "Female","D7PW_Vu_v3" = "Female","D7PW_snRNAseq_1" = "Male",
+    "D7PW_snRNAseq_2" = "Mixed", "D15PW_snRNAseq_1" = "Male", "D15PW_snRNAseq_2" = "Female",
+    "D15PW_CITEseq_1" = "Mixed","D15PW_CITEseq_2" = "Mixed","D30PW_snRNAseq_1" = "Female",
+    "D30PW_snRNAseq_2" = "Male", "D30PW_CITEseq_1" = "Mixed","D30PW_CITEseq_2" = "Mixed"
+  ),
+  chem = c(
+    "UW_Haensel1" = "10X Chromium v1","UW_Haensel2" = "10X Chromium v1","UW_Vu_v3" = "10X Chromium v3",
+    "UW_snRNAseq_1" = "10X Chromium v3","UW_snRNAseq_2" = "10X Chromium GEM-X",
+    "UW_snRNAseq_3" = "10X Chromium GEM-X","UW_CITEseq_1" = "10X Chromium v3",
+    "UW_CITEseq_2" = "10X Chromium v3","D1PW_Justynski" = "10X Chromium v3",
+    "D2PW_Justynski" = "10X Chromium v3","D4PW_Haensel1" = "10X Chromium v1",
+    "D4PW_Haensel2" = "10X Chromium v1", "D4PW_Haensel3" = "10X Chromium v1",
+    "D4PW_Vu_v3" = "10X Chromium v3","D4PW_snRNAseq_1" = "10X Chromium GEM-X",
+    "D4PW_snRNAseq_2" = "10X Chromium GEM-X","D4PW_snRNAseq_3" = "10X Chromium GEM-X",
+    "D4PW_snRNAseq_4" = "10X Chromium GEM-X","D7PW_Vu_v2_1" = "10X Chromium v2",
+    "D7PW_Vu_v2_2" = "10X Chromium v2","D7PW_Vu_v3" = "10X Chromium v3",
+    "D7PW_snRNAseq_1" = "10X Chromium v3","D7PW_snRNAseq_2" = "10X Chromium v3",
+    "D15PW_snRNAseq_1" = "10X Chromium v3","D15PW_snRNAseq_2" = "10X Chromium v3",
+    "D15PW_CITEseq_1" = "10X Chromium v3","D15PW_CITEseq_2" = "10X Chromium v3",
+    "D30PW_snRNAseq_1" = "10X Chromium v3","D30PW_snRNAseq_2" = "10X Chromium v3",
+    "D30PW_CITEseq_1" = "10X Chromium v3", "D30PW_CITEseq_2" = "10X Chromium v3"
+  )
 )
-
 
 ##4. Quality Control and Scoring
 
@@ -240,14 +262,6 @@ modality_stats <- CellCountChiSquareAnalysis(alldata, "modality")
 
 
 #8. Integration Pipeline
-
-# Reset timepoints to long format
-alldata$timepoint <- case_when(
-  alldata$timepoint == "UW" ~ "Unwounded",
-  alldata$timepoint == "D1PW" ~ "Wounded_D1PW",
-  # [Rest of mapping]
-  TRUE ~ as.character(alldata$timepoint)
-)
 
 alldata[["RNA"]] <- split(alldata[["RNA"]], f = alldata$orig.ident)
 
